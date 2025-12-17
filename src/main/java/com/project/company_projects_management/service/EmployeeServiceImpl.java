@@ -2,6 +2,7 @@ package com.project.company_projects_management.service;
 
 import com.project.company_projects_management.dao.EmployeeDAO;
 import com.project.company_projects_management.entity.Employee;
+import com.project.company_projects_management.exception.EmployeeNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee getEmployeeById(Long id) {
-        return employeeDAO.findById(id);
+        return employeeDAO.findById(id)
+                .orElseThrow(
+                        () -> new EmployeeNotFoundException("Cannot found employee with id " + id)
+                );
     }
 
     @Transactional
