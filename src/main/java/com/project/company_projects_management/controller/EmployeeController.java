@@ -2,6 +2,7 @@ package com.project.company_projects_management.controller;
 
 import com.project.company_projects_management.dto.EmployeeRequest;
 import com.project.company_projects_management.entity.Employee;
+import com.project.company_projects_management.exception.EmployeeNotFoundException;
 import com.project.company_projects_management.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -50,8 +51,8 @@ public class EmployeeController {
     @Operation(summary="Creat new employee",description="Add an employee to the database")
     public ResponseEntity<Employee> createEmployee(@Valid @RequestBody EmployeeRequest employeeRequest) {
         Employee newEmployee = applyEmployee(0L,employeeRequest);
-        employeeService.saveEmployee(newEmployee);
-        return new ResponseEntity<>(newEmployee,HttpStatus.CREATED);
+        Employee savedEmployee = employeeService.saveEmployee(newEmployee);
+        return new ResponseEntity<>(savedEmployee,HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
@@ -60,8 +61,14 @@ public class EmployeeController {
                                                    @Parameter(description = "Id of employee needs to be updated")
                                                    @PathVariable
                                                    @Min(value=1) Long id) {
-        Employee updatedEmployee = applyEmployee(id,employeeRequest);
-        employeeService.saveEmployee(updatedEmployee);
+        try {
+            employeeService.getEmployeeById(id);
+        } catch (EmployeeNotFoundException e) {
+            System.err.println("Employee not found");
+        }
+
+        Employee convertEmployee = applyEmployee(id,employeeRequest);
+        Employee updatedEmployee = employeeService.saveEmployee(convertEmployee);
         return new ResponseEntity<>(updatedEmployee,HttpStatus.OK);
     }
 
