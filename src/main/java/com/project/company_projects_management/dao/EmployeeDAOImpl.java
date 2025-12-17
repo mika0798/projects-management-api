@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class EmployeeDAOImpl implements EmployeeDAO {
@@ -26,8 +27,9 @@ public class EmployeeDAOImpl implements EmployeeDAO {
     }
 
     @Override
-    public Employee findById(Long id) {
-        return entityManager.find(Employee.class, id);
+    public Optional<Employee> findById(Long id) {
+        Employee result = entityManager.find(Employee.class, id);
+        return Optional.of(result);
     }
 
     @Override
