@@ -80,7 +80,7 @@ public class EmployeeController {
         }
         Employee tempEmployee = employeeService.getEmployeeById(id);
         Employee patchedEmployee = patchEmployee(patchPayload,tempEmployee);
-        return new ResponseEntity<>(patchedEmployee,HttpStatus.OK);
+        return new ResponseEntity<>(employeeService.saveEmployee(patchedEmployee),HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
