@@ -12,7 +12,6 @@ import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ObjectNode;
@@ -50,7 +49,7 @@ public class EmployeeController {
     @PostMapping
     @Operation(summary="Creat new employee",description="Add an employee to the database")
     public ResponseEntity<Employee> createEmployee(@Valid @RequestBody EmployeeRequest employeeRequest) {
-        Employee newEmployee = applyEmployee(0L,employeeRequest);
+        Employee newEmployee = convertEmployee(0L,employeeRequest);
         Employee savedEmployee = employeeService.saveEmployee(newEmployee);
         return new ResponseEntity<>(savedEmployee,HttpStatus.CREATED);
     }
@@ -67,7 +66,7 @@ public class EmployeeController {
             System.err.println("Employee not found");
         }
 
-        Employee convertEmployee = applyEmployee(id,employeeRequest);
+        Employee convertEmployee = convertEmployee(id,employeeRequest);
         Employee updatedEmployee = employeeService.saveEmployee(convertEmployee);
         return new ResponseEntity<>(updatedEmployee,HttpStatus.OK);
     }
@@ -80,7 +79,7 @@ public class EmployeeController {
             throw new RuntimeException("Id is not allowed in Request Body");
         }
         Employee tempEmployee = employeeService.getEmployeeById(id);
-        Employee patchedEmployee = convertEmployee(patchPayload,tempEmployee);
+        Employee patchedEmployee = patchEmployee(patchPayload,tempEmployee);
         return new ResponseEntity<>(patchedEmployee,HttpStatus.OK);
     }
 
@@ -94,7 +93,7 @@ public class EmployeeController {
         return ResponseEntity.noContent().build();
     }
 
-    private Employee applyEmployee(Long id, EmployeeRequest emRequest) {
+    private Employee convertEmployee(Long id, EmployeeRequest emRequest) {
         Employee employee = new Employee();
         if (id > 0) {
             employee.setId(id);
@@ -105,7 +104,7 @@ public class EmployeeController {
         return employee;
     }
 
-    private Employee convertEmployee(Map<String,Object> patchPayload, Employee employee) {
+    private Employee patchEmployee(Map<String,Object> patchPayload, Employee employee) {
         ObjectNode patchNode = jsonMapper.convertValue(patchPayload,ObjectNode.class);
         ObjectNode employeeNode = jsonMapper.convertValue(employee,ObjectNode.class);
 
