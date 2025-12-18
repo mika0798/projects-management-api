@@ -21,6 +21,16 @@ public class EmployeeRestExceptionHandler {
         return new ResponseEntity<>(employeeErrorResponse, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<EmployeeErrorResponse> handleNullPointerException(NullPointerException e) {
+        EmployeeErrorResponse employeeErrorResponse = new EmployeeErrorResponse();
+        employeeErrorResponse.setStatus(HttpStatus.NOT_FOUND.value());
+        employeeErrorResponse.setMessage(e.getMessage());
+        employeeErrorResponse.setTimeStamp(System.currentTimeMillis());
+
+        return new ResponseEntity<>(employeeErrorResponse, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<EmployeeErrorResponse> handleException(Exception e) {
         EmployeeErrorResponse employeeErrorResponse = new EmployeeErrorResponse();
