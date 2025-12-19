@@ -4,20 +4,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.util.AntPathMatcher;
+
 
 import javax.sql.DataSource;
 
@@ -29,15 +22,21 @@ public class EmployeeSecurityConfig {
     @Bean
     public UserDetailsManager userDetailsManager(DataSource dataSource) {
         JdbcUserDetailsManager theUserDetailsManager = new JdbcUserDetailsManager(dataSource);
-        theUserDetailsManager.setUsersByUsernameQuery("""
-                SELECT user_id, password, active FROM system_users WHERE user_id=?
-                """);
-        theUserDetailsManager.setAuthoritiesByUsernameQuery("""
-                SELECT user_id, role FROM roles WHERE user_id=?
-                """);
+        theUserDetailsManager.setUsersByUsernameQuery("SELECT user_id, password, active FROM system_users WHERE user_id=?");
+        theUserDetailsManager.setAuthoritiesByUsernameQuery("SELECT user_id, role FROM roles WHERE user_id=?");
 
         return theUserDetailsManager;
     }
+
+//    @Bean
+//    public InMemoryUserDetailsManager userDetailsManager() {
+//        UserDetails susan = User.builder()
+//                .username("susan")
+//                .password("{noop}test123")
+//                .roles("EMPLOYEE","MANAGER","ADMIN")
+//                .build();
+//        return new InMemoryUserDetailsManager(susan);
+//    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
