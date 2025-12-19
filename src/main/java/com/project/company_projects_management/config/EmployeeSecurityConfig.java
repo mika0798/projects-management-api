@@ -12,10 +12,14 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.AntPathMatcher;
+
+import javax.sql.DataSource;
 
 @Profile("dev")
 @Configuration
@@ -23,24 +27,16 @@ import org.springframework.util.AntPathMatcher;
 public class EmployeeSecurityConfig {
 
     @Bean
-    public InMemoryUserDetailsManager inMemoryUserDetailsManager() {
+    public UserDetailsManager userDetailsManager(DataSource dataSource) {
+        JdbcUserDetailsManager theUserDetailsManager = new JdbcUserDetailsManager(dataSource);
+        theUserDetailsManager.setUsersByUsernameQuery("""
+                SELECT user_id, password, active FROM system_users WHERE user_id=?
+                """);
+        theUserDetailsManager.setAuthoritiesByUsernameQuery("""
+                SELECT user_id, role FROM roles WHERE user_id=?
+                """);
 
-        UserDetails user = User.builder()
-                .username("user")
-                .password("{noop}test123")
-                .roles("EMPLOYEE")
-                .build();
-        UserDetails manager = User.builder()
-                .username("manager")
-                .password("{noop}test123")
-                .roles("EMPLOYEE","MANAGER")
-                .build();
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password("{noop}test123")
-                .roles("EMPLOYEE","MANAGER","ADMIN")
-                .build();
-        return new InMemoryUserDetailsManager(user, manager, admin);
+        return theUserDetailsManager;
     }
 
     @Bean
