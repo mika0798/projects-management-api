@@ -18,6 +18,6 @@ VALUES
 
 INSERT INTO system_users (user_id, password, active)
 VALUES
-    ('john', '{bcrypt}$2a$10$qeS0HEh7urweMojsnwNAR.vcXJeXR1UcMRZ2WcGQl9YeuspUdgF.q', TRUE),
-    ('mary', '{bcrypt}$2a$10$qeS0HEh7urweMojsnwNAR.vcXJeXR1UcMRZ2WcGQl9YeuspUdgF.q', TRUE),
-    ('susan', '{bcrypt}$2a$10$qeS0HEh7urweMojsnwNAR.vcXJeXR1UcMRZ2WcGQl9YeuspUdgF.q', TRUE);
+    ('john', '{bcrypt}$2a$10$IkcxA401PK.v71Ret.7mLewWlMj70Vg0R4WGwB/RMDG0UMuWSG4WC', TRUE),
+    ('mary', '{bcrypt}$2a$10$IkcxA401PK.v71Ret.7mLewWlMj70Vg0R4WGwB/RMDG0UMuWSG4WC', TRUE),
+    ('susan', '{bcrypt}$2a$10$IkcxA401PK.v71Ret.7mLewWlMj70Vg0R4WGwB/RMDG0UMuWSG4WC', TRUE);
