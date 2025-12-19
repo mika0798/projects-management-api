@@ -24,12 +24,10 @@ import java.util.Map;
 @RequestMapping("/api/employees")
 public class EmployeeController {
     private EmployeeService employeeService;
-    private JsonMapper jsonMapper;
 
     @Autowired
     public void setEmployeeService(EmployeeService employeeService, JsonMapper jsonMapper) {
         this.employeeService = employeeService;
-        this.jsonMapper = jsonMapper;
     }
 
     @GetMapping
@@ -49,7 +47,7 @@ public class EmployeeController {
     @PostMapping
     @Operation(summary="Creat new employee",description="Add an employee to the database")
     public ResponseEntity<Employee> createEmployee(@Valid @RequestBody EmployeeRequest employeeRequest) {
-        Employee newEmployee = convertEmployee(0L,employeeRequest);
+        Employee newEmployee = employeeService.convertEmployee(0L,employeeRequest);
         Employee savedEmployee = employeeService.saveEmployee(newEmployee);
         return new ResponseEntity<>(savedEmployee,HttpStatus.CREATED);
     }
@@ -66,7 +64,7 @@ public class EmployeeController {
             System.err.println("Employee not found");
         }
 
-        Employee convertEmployee = convertEmployee(id,employeeRequest);
+        Employee convertEmployee = employeeService.convertEmployee(id,employeeRequest);
         Employee updatedEmployee = employeeService.saveEmployee(convertEmployee);
         return new ResponseEntity<>(updatedEmployee,HttpStatus.OK);
     }
@@ -79,7 +77,7 @@ public class EmployeeController {
             throw new RuntimeException("Id is not allowed in Request Body");
         }
         Employee tempEmployee = employeeService.getEmployeeById(id);
-        Employee patchedEmployee = patchEmployee(patchPayload,tempEmployee);
+        Employee patchedEmployee = employeeService.patchEmployee(patchPayload,tempEmployee);
         return new ResponseEntity<>(employeeService.saveEmployee(patchedEmployee),HttpStatus.OK);
     }
 
@@ -93,23 +91,5 @@ public class EmployeeController {
         return ResponseEntity.noContent().build();
     }
 
-    private Employee convertEmployee(Long id, EmployeeRequest emRequest) {
-        Employee employee = new Employee();
-        if (id > 0) {
-            employee.setId(id);
-        }
-        employee.setFirstName(emRequest.getFirstName());
-        employee.setLastName(emRequest.getLastName());
-        employee.setEmail(emRequest.getEmail());
-        return employee;
-    }
-
-    private Employee patchEmployee(Map<String,Object> patchPayload, Employee employee) {
-        ObjectNode patchNode = jsonMapper.convertValue(patchPayload,ObjectNode.class);
-        ObjectNode employeeNode = jsonMapper.convertValue(employee,ObjectNode.class);
-
-        employeeNode.setAll(patchNode);
-        return jsonMapper.convertValue(employeeNode,Employee.class);
-    }
 
 }

@@ -1,45 +1,70 @@
 package com.project.company_projects_management.service;
 
 import com.project.company_projects_management.dao.EmployeeDAO;
+import com.project.company_projects_management.dto.EmployeeRequest;
 import com.project.company_projects_management.entity.Employee;
 import com.project.company_projects_management.exception.EmployeeNotFoundException;
+import com.project.company_projects_management.repository.EmployeeRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
-    private EmployeeDAO employeeDAO;
+    private final EmployeeRepository employeeRepository;
+    private JsonMapper jsonMapper;
 
     @Autowired
-    public void setEmployeeDAO(EmployeeDAO employeeDAO) {
-        this.employeeDAO = employeeDAO;
+    public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
+        this.employeeRepository = employeeRepository;
     }
 
     @Override
     public List<Employee> getAllEmployees() {
-        return employeeDAO.findAll();
+        return employeeRepository.findAll();
     }
 
     @Override
     public Employee getEmployeeById(Long id) {
-        return employeeDAO.findById(id)
+        return employeeRepository.findById(id)
                 .orElseThrow(
-                        () -> new EmployeeNotFoundException("Cannot found employee with id " + id)
+                        () -> new EmployeeNotFoundException("Cannot find employee with id " + id)
                 );
     }
 
-    @Transactional
     @Override
     public Employee saveEmployee(Employee employee) {
-        return employeeDAO.save(employee);
+        return employeeRepository.save(employee);
     }
 
-    @Transactional
     @Override
     public void deleteEmployeeById(Long id) {
-        employeeDAO.deleteById(id);
+        employeeRepository.deleteById(id);
+    }
+
+    @Override
+    public Employee convertEmployee(Long id, EmployeeRequest emRequest) {
+        Employee employee = new Employee();
+        if (id > 0) {
+            employee.setId(id);
+        }
+        employee.setFirstName(emRequest.getFirstName());
+        employee.setLastName(emRequest.getLastName());
+        employee.setEmail(emRequest.getEmail());
+        return employee;
+    }
+
+    @Override
+    public Employee patchEmployee(Map<String,Object> patchPayload, Employee employee) {
+        ObjectNode patchNode = jsonMapper.convertValue(patchPayload,ObjectNode.class);
+        ObjectNode employeeNode = jsonMapper.convertValue(employee,ObjectNode.class);
+
+        employeeNode.setAll(patchNode);
+        return jsonMapper.convertValue(employeeNode,Employee.class);
     }
 }
