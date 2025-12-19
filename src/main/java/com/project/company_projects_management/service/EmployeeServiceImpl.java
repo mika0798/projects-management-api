@@ -1,11 +1,9 @@
 package com.project.company_projects_management.service;
 
-import com.project.company_projects_management.dao.EmployeeDAO;
 import com.project.company_projects_management.dto.EmployeeRequest;
 import com.project.company_projects_management.entity.Employee;
 import com.project.company_projects_management.exception.EmployeeNotFoundException;
 import com.project.company_projects_management.repository.EmployeeRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.json.JsonMapper;
@@ -20,8 +18,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     private JsonMapper jsonMapper;
 
     @Autowired
-    public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
+    public EmployeeServiceImpl(EmployeeRepository employeeRepository,  JsonMapper jsonMapper) {
         this.employeeRepository = employeeRepository;
+        this.jsonMapper = jsonMapper;
     }
 
     @Override
