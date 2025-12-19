@@ -85,7 +85,7 @@ public class EmployeeController {
     public ResponseEntity<Void> deleteEmployee(
             @Parameter(description="Id of the employee you want to delete")
             @PathVariable @Min(value=1) Long id) {
-        Employee employee = employeeService.getEmployeeById(id);
+        Employee employee = employeeService.getEmployeeById(id); //To catch not found exception
         employeeService.deleteEmployeeById(id);
         return ResponseEntity.noContent().build();
     }
